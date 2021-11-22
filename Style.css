@@ -12,6 +12,7 @@
  }
  input{
  	height:  5vh;
+ 	
  }
  #interests{
  	width: 100%;
@@ -19,6 +20,7 @@
  }
  button{
  	background-color: #00ff00;
+ 	font-size: 100%;
  }
  div{
  	width: 20%;
