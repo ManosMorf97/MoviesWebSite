@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="style.css">
+		<title>Movies</title>
+	</head>
+	<body>
+		<div id="center1">
+			<input  type="text" placeholder="Type the movie" name="search">
+			<button id="movieList"  type="button">Find movies</button>
+		</div>
+		<div>
+			<button id="interests" type="button">Movies you propably like</button>
+		</div>
+	</body>
+</html>
+<script>
+	/*
+		//https://stackoverflow.com/questions/6396101/pure-javascript-send-post-data-without-a-form
+		setRequestHeader
+		JSON.stringify
+	*/
+	//https://stackoverflow.com/questions/9862167/positioning-div-element-at-center-of-screen/25416403
+	const xhr=new XMLHttpRequest();
+	var data=null;
+	xhr.onreadystatechange = function() {
+	 if (xhr.readyState == 4) { // 4 means request is finished
+		 if (xhr.status == 200) { // 200 means request succeeded
+		    data=JSON.parse(xhr.responseText);
+		 } else {
+		 	data=9;
+		 }
+	 }else{
+	 	data=9;
+	 }
+	};
+	xhr.open("post", "http://62.217.127.19:8010/movie", true);
+	//https://stackoverflow.com/questions/6396101/pure-javascript-send-post-data-without-a-form
+	xhr.setRequestHeader('Content-Type', 'application/json');
+	xhr.send(JSON.stringify({keyword:"Toy"}));
+	//end of help
+	setTimeout(()=>console.log(data),300);
+</script>
