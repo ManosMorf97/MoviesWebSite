@@ -1,12 +1,12 @@
  #center1{
  	position: absolute;
     left: 50%;
+    width: 90%;
  }
  body{
- 	background: black;
+ 	background-color: #150847;
  }
  #search{
- 	margin-left:2%;
  	margin-right:2%;
  	height: 5vh;
  }
@@ -22,7 +22,13 @@
  	background-color: #00ff00;
  	font-size: 100%;
  }
- div{
+ .first-divs{
  	width: 20%;
  	height: 20%;
  }
+.movies{
+  background-color:#ff0000;
+}
+.checked {
+  color: orange;
+}
