@@ -7,25 +7,15 @@
 	</head>
 	<body>
 		<div id="center1" class="first-divs">
-			<input id="search_text" type="text" placeholder="Search..." name="search">
-			<button id="search"  type="button">Search</button>
+			<form id="search_results" method="POST">
+				<input id="search_text" type="text" placeholder="Search..." name="search">
+				<input id="search" value="Search" type="submit"></input>
+			</form>
 		</div>
 		<div class="first-divs">
 			<button id="interests" type="button">Movies you propably like</button>
 		</div>
-			<div class='movies'>
-			    <h1>id</h1>
-			    <br>
-			    <h1>title</h1>
-			    <br>
-			    <h1>genres</h1>
-			    <br>
-				    <h1>Ratings</h1>
-				    <span id=''class="fa fa-star checked"></span>
-					<span class="fa fa-star checked"></span>
-					<span class="fa fa-star checked"></span>
-					<span class="fa fa-star"></span>
-					<span class="fa fa-star"></span>
+			<div id="list">
 			</div>
 	</body>
 </html>

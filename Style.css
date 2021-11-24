@@ -5,6 +5,7 @@
  }
  body{
  	background-color: #150847;
+   overflow-anchor: none;
  }
  #search{
  	margin-right:2%;
@@ -18,7 +19,7 @@
  	width: 100%;
  	height: 5vh;
  }
- button{
+ #search,button{
  	background-color: #00ff00;
  	font-size: 100%;
  }

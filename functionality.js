@@ -9,29 +9,11 @@
 		https://www.w3schools.com/howto/howto_css_star_rating.asp
 		https://intellipaat.com/community/21064/how-to-change-an-elements-class-with-javascript
 		https://stackoverflow.com/questions/7266069/adding-external-stylesheet-using-javascript
+		https://stackoverflow.com/questions/59524026/content-shifts-slightly-on-page-reload-with-chrome
+		https://www.javascripttutorial.net/dom/manipulating/remove-all-child-nodes/
 */
-/*
-	const xhr=new XMLHttpRequest();
-	var data=null;
-	xhr.onreadystatechange = function() {
-	 if (xhr.readyState == 4) { // 4 means request is finished
-		 if (xhr.status == 200) { // 200 means request succeeded
-		    data=JSON.parse(xhr.responseText);
-		 } else {
-		 	data=9;
-		 }
-	 }else{
-	 	data=9;
-	 }
-	};
-	xhr.open("post", "http://62.217.127.19:8010/movie", true);
-	//https://stackoverflow.com/questions/6396101/pure-javascript-send-post-data-without-a-form
-	xhr.setRequestHeader('Content-Type', 'application/json');
-	xhr.send(JSON.stringify({keyword:"Toy"}));
-	//end of help
-	setTimeout(()=>console.log(data),300);
-*/
-document.getElementById("search").addEventListener('click',()=>{
+document.getElementById("search_results").addEventListener('submit',(e)=>{
+	e.preventDefault();
 	let key=document.getElementById("search_text").value;
 	const xhr=new XMLHttpRequest();
 	var data=null;
@@ -39,6 +21,7 @@ document.getElementById("search").addEventListener('click',()=>{
 	 if (xhr.readyState == 4) { // 4 means request is finished
 		 if (xhr.status == 200) { // 200 means request succeeded
 		    data=JSON.parse(xhr.responseText);
+		    succesful(data);
 		 } else {
 		 }
 	 }else{
@@ -47,7 +30,14 @@ document.getElementById("search").addEventListener('click',()=>{
 	xhr.open("post", "http://62.217.127.19:8010/movie", true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
 	xhr.send(JSON.stringify({keyword:key}));
-	setTimeout(()=>{
+	function succesful(data){
+		var contentArea=document.getElementById("list");
+		function removeAllChildNodes(parent) {
+		    while (parent.firstChild) {
+		        parent.removeChild(parent.firstChild);
+		    }
+		}
+		removeAllChildNodes(document.getElementById("list"));
 		console.log(data);
 		if(data){
 			var element = document.createElement("link");
@@ -55,10 +45,9 @@ document.getElementById("search").addEventListener('click',()=>{
 			element.setAttribute("type", "text/css");
 			element.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
 			document.getElementsByTagName("head")[0].appendChild(element);
-			var contentArea = document.getElementsByTagName("body")[0];
 			for(let i=0; i<data.length; i++){
 				let movie_div=document.createElement("div");
-				movie_div.style.backgroundColor="red";
+				movie_div.classList.add("movies");
 				for(const props in data[i]){
 					let movie_info=document.createElement("h1");
 					let property=document.createTextNode(data[i][props]);
@@ -69,16 +58,28 @@ document.getElementById("search").addEventListener('click',()=>{
 				let property=document.createTextNode("Ratings");
 				ratings.appendChild(property);
 				movie_div.appendChild(ratings);
-				var stars=[];
+				let stars=[];
 				for(let j=0; j<5; j++){
 					stars.push(document.createElement("span"));
-					document.querySelectorAll("span")[j].classList.add('fa');
-					document.querySelectorAll("span")[j].classList.add('fa-star');
+					stars[j].classList.add('fa');
+					stars[j].classList.add('fa-star');
 					movie_div.appendChild(stars[j]);
+				}
+				for(let j=0; j<5; j++){
+					let rating=0;
+					stars[j].addEventListener('click',()=>{
+						rating=j+1;
+						for(let k=0; k<5; k++){
+							if(k<=j)
+								stars[k].classList.add('checked');
+							else
+								stars[k].classList.remove('checked');
+						}
+					})
 				}
 				contentArea.appendChild(movie_div);
 			}
 		}
-	},300)
 	
-}) 
+	}
+})
