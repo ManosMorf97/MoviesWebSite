@@ -11,7 +11,33 @@
 		https://stackoverflow.com/questions/7266069/adding-external-stylesheet-using-javascript
 		https://stackoverflow.com/questions/59524026/content-shifts-slightly-on-page-reload-with-chrome
 		https://www.javascripttutorial.net/dom/manipulating/remove-all-child-nodes/
+		https://stackoverflow.com/questions/34581440/text-extends-outside-button-html
+		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
+		https://stackoverflow.com/questions/16206322/how-to-get-js-variable-to-retain-value-after-page-refresh
 */
+
+const xhr=new XMLHttpRequest();
+	var data=null;
+	xhr.onreadystatechange = function() {
+	 if (xhr.readyState == 4) { // 4 means request is finished
+		 if (xhr.status == 200) { // 200 means request succeeded
+		    data=JSON.parse(xhr.responseText);
+		    console.log(data);
+		 } else {
+		 }
+	 }else{
+	 }
+	};
+	xhr.open("post", "http://62.217.127.19:8010/ratings", true);
+	xhr.setRequestHeader('Content-Type', 'application/json');
+	xhr.send(JSON.stringify({movieList:[4306]}));
+
+let movie_ratings ;
+//movie_ratings=localStorage.getItem("movie_ratings")
+//console.log(movie_ratings)
+//if(!movie_ratings)
+movie_ratings=new Map();
+
 document.getElementById("search_results").addEventListener('submit',(e)=>{
 	e.preventDefault();
 	let key=document.getElementById("search_text").value;
@@ -30,6 +56,7 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 	xhr.open("post", "http://62.217.127.19:8010/movie", true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
 	xhr.send(JSON.stringify({keyword:key}));
+
 	function succesful(data){
 		var contentArea=document.getElementById("list");
 		function removeAllChildNodes(parent) {
@@ -66,6 +93,9 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 					movie_div.appendChild(stars[j]);
 				}
 				for(let j=0; j<5; j++){
+					for(let k=0; k<movie_ratings.get(data[i].movieId); k++){
+						stars[k].classList.add('checked');
+					}
 					let rating=0;
 					stars[j].addEventListener('click',()=>{
 						rating=j+1;
@@ -75,7 +105,12 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 							else
 								stars[k].classList.remove('checked');
 						}
+						movie_ratings.set(data[i].movieId,data[i].rating);
+						localStorage.setItem("movie_ratings",movie_ratings);
 					})
+
+
+
 				}
 				contentArea.appendChild(movie_div);
 			}
@@ -83,3 +118,4 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 	
 	}
 })
+
