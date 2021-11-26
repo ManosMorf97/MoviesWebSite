@@ -15,6 +15,7 @@
 		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
 		https://stackoverflow.com/questions/16206322/how-to-get-js-variable-to-retain-value-after-page-refresh
 		https://stackoverflow.com/questions/28918232/how-do-i-persist-a-es6-map-in-localstorage-or-elsewhere
+		https://stackoverflow.com/questions/8336812/way-to-insert-text-having-apostrophe-into-a-sql-table
 */
 
 const xhr=new XMLHttpRequest();
@@ -57,6 +58,10 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 	};
 	xhr.open("post", "http://62.217.127.19:8010/movie", true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
+	let apostrophe=key.indexOf("'");
+	if(apostrophe>=0){
+		key=key.substring(0,apostrophe+1)+"'"+key.substring(apostrophe+1);
+	}
 	xhr.send(JSON.stringify({keyword:key}));
 
 	function succesful(data){
