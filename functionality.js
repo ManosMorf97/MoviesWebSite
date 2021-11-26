@@ -14,6 +14,7 @@
 		https://stackoverflow.com/questions/34581440/text-extends-outside-button-html
 		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
 		https://stackoverflow.com/questions/16206322/how-to-get-js-variable-to-retain-value-after-page-refresh
+		https://stackoverflow.com/questions/28918232/how-do-i-persist-a-es6-map-in-localstorage-or-elsewhere
 */
 
 const xhr=new XMLHttpRequest();
@@ -32,11 +33,12 @@ const xhr=new XMLHttpRequest();
 	xhr.setRequestHeader('Content-Type', 'application/json');
 	xhr.send(JSON.stringify({movieList:[4306]}));
 
-let movie_ratings ;
-//movie_ratings=localStorage.getItem("movie_ratings")
-//console.log(movie_ratings)
-//if(!movie_ratings)
-movie_ratings=new Map();
+//localStorage.clear();
+let movie_ratings;
+if(localStorage.movie_ratings)
+ 	movie_ratings=new Map(JSON.parse(localStorage.movie_ratings));
+else
+	movie_ratings=new Map();
 
 document.getElementById("search_results").addEventListener('submit',(e)=>{
 	e.preventDefault();
@@ -105,17 +107,14 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 							else
 								stars[k].classList.remove('checked');
 						}
-						movie_ratings.set(data[i].movieId,data[i].rating);
-						localStorage.setItem("movie_ratings",movie_ratings);
+						movie_ratings.set(data[i].movieId,rating);
+						localStorage.movie_ratings = JSON.stringify(Array.from(movie_ratings.entries()));
 					})
-
-
-
 				}
 				contentArea.appendChild(movie_div);
 			}
 		}
 	
 	}
-})
+});
 
