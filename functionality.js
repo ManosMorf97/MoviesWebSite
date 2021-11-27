@@ -104,22 +104,25 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 						stars[k].classList.add('checked');
 					}
 					let rating=0;
-					stars[j].addEventListener('click',()=>{
-						rating=j+1;
-						for(let k=0; k<5; k++){
-							if(k<=j)
-								stars[k].classList.add('checked');
-							else
-								stars[k].classList.remove('checked');
-						}
-						movie_ratings.set(data[i].movieId,rating);
-						localStorage.movie_ratings = JSON.stringify(Array.from(movie_ratings.entries()));
-					})
+					stars[j].addEventListener('click',saveRating(stars,j,data[i]));
 				}
 				contentArea.appendChild(movie_div);
 			}
 		}
 	
+	}
+	function saveRating(stars,j,movie){
+		return ()=>{
+			let rating=j+1;
+			for(let k=0; k<5; k++){
+				if(k<=j)
+					stars[k].classList.add('checked');
+				else
+					stars[k].classList.remove('checked');
+			}
+			movie_ratings.set(movie.movieId,rating);
+			localStorage.movie_ratings = JSON.stringify(Array.from(movie_ratings.entries()));
+		}
 	}
 });
 
