@@ -41,6 +41,15 @@ if(localStorage.movie_ratings)
 else
 	movie_ratings=new Map();
 
+function apostropheKey(key){
+	let apostrophe=key.indexOf("'");
+	if(apostrophe>=0){
+		return key.substring(0,apostrophe+1)+"'"+apostropheKey(key.substring(apostrophe+1));
+	}else{
+		return key;
+	}
+}
+
 document.getElementById("search_results").addEventListener('submit',(e)=>{
 	e.preventDefault();
 	let key=document.getElementById("search_text").value;
@@ -56,12 +65,9 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 	 }else{
 	 }
 	};
+	key=apostropheKey(key);
 	xhr.open("post", "http://62.217.127.19:8010/movie", true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
-	let apostrophe=key.indexOf("'");
-	if(apostrophe>=0){
-		key=key.substring(0,apostrophe+1)+"'"+key.substring(apostrophe+1);
-	}
 	xhr.send(JSON.stringify({keyword:key}));
 
 	function succesful(data){
