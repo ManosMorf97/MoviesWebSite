@@ -16,24 +16,12 @@
 		https://stackoverflow.com/questions/16206322/how-to-get-js-variable-to-retain-value-after-page-refresh
 		https://stackoverflow.com/questions/28918232/how-do-i-persist-a-es6-map-in-localstorage-or-elsewhere
 		https://stackoverflow.com/questions/8336812/way-to-insert-text-having-apostrophe-into-a-sql-table
+		https://stackoverflow.com/questions/27612713/convert-es6-iterable-to-array
+		https://www.w3schools.com/jsref/jsref_max_value.asp
+		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
+		https://www.youtube.com/watch?v=DHvZLI7Db8E&t=289s
+		https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
 */
-
-const xhr=new XMLHttpRequest();
-	var data=null;
-	xhr.onreadystatechange = function() {
-	 if (xhr.readyState == 4) { // 4 means request is finished
-		 if (xhr.status == 200) { // 200 means request succeeded
-		    data=JSON.parse(xhr.responseText);
-		    console.log(data);
-		 } else {
-		 }
-	 }else{
-	 }
-	};
-	xhr.open("post", "http://62.217.127.19:8010/ratings", true);
-	xhr.setRequestHeader('Content-Type', 'application/json');
-	xhr.send(JSON.stringify({movieList:[4306]}));
-
 //localStorage.clear();
 let movie_ratings;
 if(localStorage.movie_ratings)
@@ -56,14 +44,14 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 	const xhr=new XMLHttpRequest();
 	var data=null;
 	xhr.onreadystatechange = function() {
-	 if (xhr.readyState == 4) { // 4 means request is finished
-		 if (xhr.status == 200) { // 200 means request succeeded
-		    data=JSON.parse(xhr.responseText);
-		    succesful(data);
-		 } else {
-		 }
-	 }else{
-	 }
+		if (xhr.readyState == 4) { // 4 means request is finished
+			if (xhr.status == 200) { // 200 means request succeeded
+			    data=JSON.parse(xhr.responseText);
+			    succesful(data);
+			} else {
+			}
+		}else{
+		}
 	};
 	key=apostropheKey(key);
 	xhr.open("post", "http://62.217.127.19:8010/movie", true);
@@ -131,4 +119,98 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 		}
 	}
 });
+function getData(data,begining,ending,array){
+	if (begining>array.length-1){
+		return data;
+	}
+	const xhr=new XMLHttpRequest();	
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) { // 4 means request is finished
+			if (xhr.status == 200) { // 200 means request succeeded
+			    data.push(JSON.parse(xhr.responseText));
+			    console.log(data)
+			    getData(data,ending,ending+ending-begining,array);
+			} else {
+			}
+			}else{
+		}
+	};
+	xhr.open("post", "http://62.217.127.19:8010/ratings", true);
+	xhr.setRequestHeader('Content-Type', 'application/json');
+	xhr.send(JSON.stringify({movieList:array.slice(begining,ending)}));
+}
+
+document.getElementById("interests").addEventListener('click',()=>{
+	var users=[];
+	users.push(null);
+	var min_user=[null];
+	var users_ids=[];
+	let movie_array=[...movie_ratings.keys()];
+	console.log(movie_array);
+	let min=[]
+	min.push(Number.MAX_VALUE);
+	function getUsers(movie_array,users,min,min_user,users_ids,resolve,reject,permision){
+		const xhr=new XMLHttpRequest();	
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4) { // 4 means request is finished
+				 if (xhr.status == 200) { // 200 means request succeeded
+				    users[0]=JSON.parse(xhr.responseText);
+				    users_ids.push(...users[0][0].map(x=>x.userId));
+				    console.log(users_ids);
+				 } else {
+				 	getUsers(movie_array.slice(0,movie_array.length/2),users,min,min_user,users_ids,resolve,reject,false);
+				 	getUsers(movie_array.slice(movie_array.length/2),users,min,min_user,users_ids,resolve,reject,false);
+				 }
+				 if(permision)
+					resolve("Success");
+			}else{
+		 	}
+		};
+		xhr.open("post", "http://62.217.127.19:8010/ratings", true);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.send(JSON.stringify({movieList:movie_array}));
+	}
+	let p=new Promise((resolve,reject)=>{
+		getUsers(movie_array,users,min,min_user,users_ids,resolve,reject,true);
+	});
+	p.then((message)=>{
+		console.log(message)
+		users_ids=[...new Set(users_ids)];
+		console.log(users_ids)
+		step2(movie_ratings,movie_array,min,min_user,users_ids,0);
+	});
+
+	function step2(movie_ratings,movie_array,min,min_user,users_ids,i){
+		if(i==users_ids.length) return;
+		let p=new Promise((resolve,reject)=>{
+			const xhr=new XMLHttpRequest();	
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4) { // 4 means request is finished
+					if (xhr.status == 200) {
+					// 200 means request succeeded
+					    findCorrelation(movie_ratings,min,min_user);
+					    resolve("success");
+					} else {
+					 	reject("Failure");
+					}
+				}else{
+			 	}
+			};
+			xhr.open("get", "http://62.217.127.19:8010/ratings/"+users_ids[i], true);
+			xhr.send();
+		});
+		p.then((message)=>{
+			step2(movie_array,min,min_user,users_ids,i+1);
+		})
+
+	}
+	function findCorrelation(movie_ratings,min,min_user){
+		console.log("W")
+
+	}
+	
+});
+
+
+
 
