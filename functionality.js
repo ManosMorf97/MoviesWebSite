@@ -22,13 +22,18 @@
 		https://www.youtube.com/watch?v=DHvZLI7Db8E&t=289s
 		https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
 		https://stackoverflow.com/questions/8206988/how-do-i-copy-a-map-into-a-duplicate-map
+		https://stackoverflow.com/questions/14824283/convert-a-2d-javascript-array-to-a-1d-array
+		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+		https://www.codegrepper.com/code-examples/javascript/find+intersection+of+two+arrays+es6
+		https://stackoverflow.com/questions/35341696/how-to-convert-map-keys-to-array
 */
 //localStorage.clear();
-let movie_ratings;
+let object ={};
 if(localStorage.movie_ratings)
- 	movie_ratings=new Map(JSON.parse(localStorage.movie_ratings));
+ 	object.movie_ratings=new Map(JSON.parse(localStorage.movie_ratings));
 else
-	movie_ratings=new Map();
+	object.movie_ratings=new Map();
+console.log(object.movie_ratings.keys())
 
 function apostropheKey(key){
 	let apostrophe=key.indexOf("'");
@@ -41,184 +46,185 @@ function apostropheKey(key){
 
 document.getElementById("search_results").addEventListener('submit',(e)=>{
 	e.preventDefault();
-	let key=document.getElementById("search_text").value;
-	const xhr=new XMLHttpRequest();
-	var data=null;
-	xhr.onreadystatechange = function() {
-		if (xhr.readyState == 4) { // 4 means request is finished
-			if (xhr.status == 200) { // 200 means request succeeded
-			    data=JSON.parse(xhr.responseText);
-			    succesful(data);
-			} else {
-			}
-		}else{
-		}
-	};
-	key=apostropheKey(key);
-	xhr.open("post", "http://62.217.127.19:8010/movie", true);
-	xhr.setRequestHeader('Content-Type', 'application/json');
-	xhr.send(JSON.stringify({keyword:key}));
-
-	function succesful(data){
-		var contentArea=document.getElementById("list");
-		function removeAllChildNodes(parent) {
-		    while (parent.firstChild) {
-		        parent.removeChild(parent.firstChild);
-		    }
-		}
-		removeAllChildNodes(document.getElementById("list"));
-		console.log(data);
-		if(data){
-			var element = document.createElement("link");
-			element.setAttribute("rel", "stylesheet");
-			element.setAttribute("type", "text/css");
-			element.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
-			document.getElementsByTagName("head")[0].appendChild(element);
-			for(let i=0; i<data.length; i++){
-				let movie_div=document.createElement("div");
-				movie_div.classList.add("movies");
-				for(const props in data[i]){
-					let movie_info=document.createElement("h1");
-					let property=document.createTextNode(data[i][props]);
-					movie_info.appendChild(property);
-					movie_div.appendChild(movie_info);
-				}
-				var ratings=document.createElement("h1");
-				let property=document.createTextNode("Ratings");
-				ratings.appendChild(property);
-				movie_div.appendChild(ratings);
-				let stars=[];
-				for(let j=0; j<5; j++){
-					stars.push(document.createElement("span"));
-					stars[j].classList.add('fa');
-					stars[j].classList.add('fa-star');
-					movie_div.appendChild(stars[j]);
-				}
-				for(let j=0; j<5; j++){
-					for(let k=0; k<movie_ratings.get(data[i].movieId); k++){
-						stars[k].classList.add('checked');
-					}
-					let rating=0;
-					stars[j].addEventListener('click',saveRating(stars,j,data[i]));
-				}
-				contentArea.appendChild(movie_div);
-			}
-		}
-	
-	}
-	function saveRating(stars,j,movie){
-		return ()=>{
-			let rating=j+1;
-			for(let k=0; k<5; k++){
-				if(k<=j)
-					stars[k].classList.add('checked');
-				else
-					stars[k].classList.remove('checked');
-			}
-			movie_ratings.set(movie.movieId,rating);
-			localStorage.movie_ratings = JSON.stringify(Array.from(movie_ratings.entries()));
-		}
-	}
+	search(object);
 });
+	function search(object){
+		let key=document.getElementById("search_text").value;
+		const xhr=new XMLHttpRequest();
+		function request(xhr){
+			return()=>{
+				if (xhr.readyState == 4) { // 4 means request is finished
+					if (xhr.status == 200) { // 200 means request succeeded
+					    let data=JSON.parse(xhr.responseText);
+					    succesful(data,object);
+					} else {
+					}
+				}else{
+				}
+			}
+		}
+		xhr.onreadystatechange = request(xhr)
+		key=apostropheKey(key);
+		xhr.open("post", "http://62.217.127.19:8010/movie", true);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.send(JSON.stringify({keyword:key}));
 
-document.getElementById("interests").addEventListener('click',()=>{
-	var users;
+		function succesful(data,object){
+			var contentArea=document.getElementById("list");
+			function removeAllChildNodes(parent) {
+			    while (parent.firstChild) {
+			        parent.removeChild(parent.firstChild);
+			    }
+			}
+			removeAllChildNodes(document.getElementById("list"));
+			console.log(data);
+			if(data){
+				var element = document.createElement("link");
+				element.setAttribute("rel", "stylesheet");
+				element.setAttribute("type", "text/css");
+				element.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+				document.getElementsByTagName("head")[0].appendChild(element);
+				for(let i=0; i<data.length; i++){
+					let movie_div=document.createElement("div");
+					movie_div.classList.add("movies");
+					for(const props in data[i]){
+						let movie_info=document.createElement("h1");
+						let property=document.createTextNode(data[i][props]);
+						movie_info.appendChild(property);
+						movie_div.appendChild(movie_info);
+					}
+					var ratings=document.createElement("h1");
+					let property=document.createTextNode("Ratings");
+					ratings.appendChild(property);
+					movie_div.appendChild(ratings);
+					let stars=[];
+					for(let j=0; j<5; j++){
+						stars.push(document.createElement("span"));
+						stars[j].classList.add('fa');
+						stars[j].classList.add('fa-star');
+						movie_div.appendChild(stars[j]);
+					}
+					for(let j=0; j<5; j++){
+						for(let k=0; k<object.movie_ratings.get(data[i].movieId); k++){
+							stars[k].classList.add('checked');
+						}
+						let rating=0;
+						stars[j].addEventListener('click',saveRating(stars,j,data[i],object));
+					}
+					contentArea.appendChild(movie_div);
+				}
+			}
+		
+		}
+		function saveRating(stars,j,movie,object){
+			return ()=>{
+				let rating=j+1;
+				for(let k=0; k<5; k++){
+					if(k<=j)
+						stars[k].classList.add('checked');
+					else
+						stars[k].classList.remove('checked');
+				}
+				object.movie_ratings.set(movie.movieId,rating);
+				localStorage.movie_ratings = JSON.stringify(Array.from(object.movie_ratings.entries()));
+			}
+		}
+	}
+	
+
+document.getElementById("interests").addEventListener('click',clickInterests(object));
+	/*var users;
 	var min_user=null;
-	var users_ids=[];
-	let movie_array=[...movie_ratings.keys()];
-	console.log(movie_array);
 	let min=[];
 	min.push(Number.MAX_VALUE);
-	function getUsers(movie_array,resolve,reject){
-		let xhr=new XMLHttpRequest();	
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4) { // 4 means request is finished
-				 if (xhr.status == 200) { // 200 means request succeeded
-				 	try{
-				 		users=JSON.parse(xhr.responseText);
-				 		users_ids=[];
-				 		for(let i=0; i<users.length; i++)
-				        	users_ids.push(...users[i].map(x=>x.userId));
-				        users_ids=[...new Set(users_ids)];
-				        step2(resolve);
-				 	}catch(err){
-				 		reject("Error");
-				 	}
-				    
-				} else {
-				 	
-				 	//getUsers(movie_array.slice(0,movie_array.length/2),users,min,min_user,users_ids,resolve,reject,false);
-				 	//getUsers(movie_array.slice(movie_array.length/2),users,min,min_user,users_ids,resolve,reject,false);
-				 }
-			}else{
-		 	}
-		};
+	*/
+function clickInterests(object){
+	return function step1(){
+		movie_array=[...object.movie_ratings.keys()];
+		let end=false;
+		let bricks=1;
+		while(!end){
+		    object.users=new Array(bricks);
+		    let broken=false;
+			for(let i=0; i<bricks; i++){	
+				if(!getUsers(movie_array.slice(i*movie_array.length/bricks,(i+1)*movie_array.length/bricks),i,object)){
+					broken=true;
+					break;
+				}
+			}
+	        if(broken){
+	        	bricks++;
+	        }else{
+	        	end=true;
+	        }
+			console.log("Great");
+			console.log(bricks);
+		}
+	}
+}
+
+
+async function getUsers(movie_array,index,object){
+	try{
+		let users_ids=[];
+		const xhr= new XMLHttpRequest();
+		function request(xhr,object,users_ids,index){
+			return ()=>{
+				if (xhr.readyState == 4) { // 4 means request is finished
+					if (xhr.status == 200) {
+						object.users[index]=JSON.parse(xhr.responseText);
+						for(const user of object.users[index]){
+							users_ids.push(...user.map(x=>x.userId));
+						}
+					// 200 means request succeeded
+					    step2(users_ids,index,object);
+					} else {
+					}
+				}else{
+		 		}
+			}
+		}
+		xhr.onreadystatechange = request(xhr,object,users_ids,index);
 		xhr.open("post", "http://62.217.127.19:8010/ratings", true);
 		xhr.setRequestHeader('Content-Type', 'application/json');
 		xhr.send(JSON.stringify({movieList:movie_array}));
+		return true;
+	}catch(error){
+		return false;
 	}
-	let end=false;
-	let bricks=1;
-	while(!end){
-		let p=new Promise((resolve,reject)=>{
-			for(let i=0; i<bricks; i++){
-				getUsers(movie_array.slice(i*movie_array.length/bricks,(i+1)*movie_array.length/bricks),resolve,reject);
-			}
-			end=true;
-			resolve("Success");
-		});
-		p.then((message)=>{
-			end=true;
-			console.log(message);
-		}).catch((message)=>{
-			bricks++;
-			end=false;
-		});
-	}
-	
+}
 
-	async function step2(resolve){
-		for(let i=0; i<users_ids.length; i++){
-			let p=new Promise((resolve2,reject2)=>{
-				const xhr=new XMLHttpRequest();
-				var rated_movies=null;
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState == 4) { // 4 means request is finished
-						if (xhr.status == 200) {
-							rated_movies=JSON.parse(xhr.responseText);
-						// 200 means request succeeded
-						    findCorrelation(rated_movies,i);
-						    resolve2("success");
-						} else {
-						 	reject2("Failure");
-						}
-					}else{
-				 	}
-				};
-				xhr.open("get", "http://62.217.127.19:8010/ratings/"+users_ids[i], true);
-				xhr.send();
-			});
-			p.then((message)=>{
-			});
-			await p;
+function step2(users_ids,index,object){
+	users_ids=[...new Set(users_ids)];
+	let movies=[].concat(...object.users[index])
+	console.log("rated_movies")		
+	for(let i=0; i<users_ids.length; i++){
+		let rated_movies=[];
+		for(const element of movies){
+			if(element.userId==users_ids[i])
+				rated_movies.push(element)
 		}
-		resolve("Success")
-
+		findCorrelation(rated_movies,i,object);
 	}
-	function findCorrelation(rated_movies,i){
-		let movie_ratings_array=new Map(movie_ratings);
-		let correlated_movies=new Map();
-		for(let i=0; i<rated_movies.length; i++){
-			correlated_movies.set(rated_movies[i].movieId,rated_movies[i].rating);
-		}
 
+}
 
-
-
+function findCorrelation(rated_movies,i,object){
+	let map_rated_movies=new Map();
+	for(const element of rated_movies)
+		map_rated_movies.set(element.movieId,element.rating)
+	let common_movies=getArraysIntersection([...rated_movies.keys()],[...object.movie_ratings.keys()]);
+	let my_ratings=[];
+	let their_ratings=[];
+	for(const movie of common_movies){
+		my_ratings.push(movie_ratings.get(movie));
+        their_ratings.push(correlated_movies.get(movie))
 	}
-	
-});
-
-
+	//formula in google
+	console.log("DONE")
+}
+function getArraysIntersection(a1,a2){
+	return  a1.filter(function(n) { return a2.indexOf(n) !== -1;});
+}
 
 
