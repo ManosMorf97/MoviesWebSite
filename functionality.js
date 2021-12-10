@@ -30,6 +30,11 @@
 		https://www.w3schools.com/jsref/jsref_shift.asp
 
 */
+var element = document.createElement("link");
+element.setAttribute("rel", "stylesheet");
+element.setAttribute("type", "text/css");
+element.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
 //localStorage.clear();
 let movie_ratings;
 if(localStorage.movie_ratings)
@@ -108,13 +113,9 @@ function removeAllChildNodes(parent) {
 
 function successful(data){
 	var contentArea=document.getElementById("list");
-	removeAllChildNodes(document.getElementById("list"));
+	removeAllChildNodes(contentArea);
 	console.log(data);
 	if(data){
-		var element = document.createElement("link");
-		element.setAttribute("rel", "stylesheet");
-		element.setAttribute("type", "text/css");
-		element.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
 		document.getElementsByTagName("head")[0].appendChild(element);
 		for(let i=0; i<data.length; i++){
 			let movie_div=document.createElement("div");
@@ -189,51 +190,60 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 });
 
 document.getElementById("interests").addEventListener('click',()=>{
-
-	removeAllChildNodes(document.getElementById("list"));
 	var users;
-	var min_user;
+	var max_user;
 	let movie_array=[...movie_ratings.keys()];
-	let min;
-	let end=false;
+	let max;
 	let bricks=1;
-	while(!end){
+	let turned_on;
+	var contentArea=document.getElementById("list");
+	removeAllChildNodes(contentArea);
+	let h=document.createElement("h1");
+	let message=document.createTextNode("Loading");
+	h.appendChild(message);
+	h.classList.add('message');
+	contentArea.appendChild(h);
+	function step1(){
 	    users=new Array(bricks);
 		let p=new Promise((resolve,reject)=>{
-			min=[];
-            min_user=[];
+			max=[];
+            max_user=[];
+            turned_on=[];
+            for(let i=0; i<bricks; i++)
+            	turned_on.push(false);
 			for(let i=0; i<bricks; i++){
-				min.push(0);
-				min_user.push(null);	
-				if(!getUsers(movie_array.slice(i*movie_array.length/bricks,(i+1)*movie_array.length/bricks),i)){
-					reject("Error");
-				}
+				max.push(-2);
+				max_user.push(null);
+				getUsers(movie_array.slice(i*movie_array.length/bricks,(i+1)*movie_array.length/bricks),i,resolve,reject);	
 			}
-			end=true;
-			resolve("Success")
 		});
 		p.then((message)=>{
-			end=true;
 			console.log(message);
 			console.log(bricks);
+			step2B();
 		})
 		p.catch((message)=>{
-			bricks++;
-			end=false;
+			step1();
+			
 		});
 	}
-	let min2=min[0];
-	let min_user2=min_user[0];
-	for(let i=1; i<bricks; i++)
-		if(min2<min[i]){
-			min2=min[i];
-			min_user2=min_user[i];
-		}
-	console.log(min_user2)
-	step3(min_user2);
+	step1();
+	function step2B(){
+		let max2=max[0];
+		let max_user2=max_user[0];
+		for(let i=1; i<bricks; i++)
+			if(max2<max[i]){
+				max2=max[i];
+				max_user2=max_user[i];
+			}
+		console.log(max_user2)
+		step3(max_user2);
+	}
+	
+	
 
 	
-	async function getUsers(movie_array,index){
+	async function getUsers(movie_array,index,resolve,reject){
 		try{
 			let users_ids=[];
 			const xhr= new XMLHttpRequest();
@@ -246,17 +256,20 @@ document.getElementById("interests").addEventListener('click',()=>{
 						}
 					// 200 means request succeeded
 					    step2(users_ids,index);
+					    turned_on[index]=true;
+					    if(turned_on.filter(x=>!x).length==0)
+					    	resolve("Success")
 					} else {
 					}
 				}else{
 			 	}
 			};
-			xhr.open("post", "http://62.217.127.19:8010/ratings", false);
+			xhr.open("post", "http://62.217.127.19:8010/ratings", true);
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.send(JSON.stringify({movieList:movie_array}));
 			return true;
 		}catch(error){
-			return false;
+			reject("Failure");
 		}
 	}
 
@@ -297,9 +310,9 @@ document.getElementById("interests").addEventListener('click',()=>{
         	cov+=(my_ratings[i]-my_ratings_mean)*(their_ratings[i]-their_ratings_mean);
         }
         let r=cov/(my_ratings_sd*their_ratings_sd);
-        if(r<=min[index]){
-        	min[index]=r;
-        	min_user[index]=user;
+        if(r>max[index]){
+        	max[index]=r;
+        	max_user[index]=user;
         }
        
 	}
@@ -308,7 +321,7 @@ document.getElementById("interests").addEventListener('click',()=>{
     	return  a1.filter(function(n) { return a2.indexOf(n) !== -1;});
 	}
 
-	function step3(min_user){
+	function step3(max_user){
 		const xhr= new XMLHttpRequest();
 		let data=null;
 			xhr.onreadystatechange = function() {
@@ -323,7 +336,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 				}else{
 			 	}
 			};
-			xhr.open("get", "http://62.217.127.19:8010/ratings/"+min_user, true);
+			xhr.open("get", "http://62.217.127.19:8010/ratings/"+max_user, true);
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.send();
 			console.log("GO")
@@ -332,6 +345,9 @@ document.getElementById("interests").addEventListener('click',()=>{
 	function showMovies(data){
 		data=data.filter(x=>x.rating>=4);
 		let correlated_movies=new Array(data.length);
+		let turned_on_final=[];
+		for(let i=0; i<data.length; i++)
+			turned_on_final.push(false);
 		let promise=new Promise((resolve,reject)=>{
 			for(let i=0; i<data.length; i++){
 				const xhr= new XMLHttpRequest();
@@ -340,7 +356,8 @@ document.getElementById("interests").addEventListener('click',()=>{
 						if (xhr.status == 200) {
 							correlated_movies[i]=JSON.parse(xhr.responseText);
 							console.log(correlated_movies[i]);
-							if(i==data.length-1)
+							turned_on_final[i]=true
+							if(turned_on_final.filter(x=>!x).length==0)
 								resolve("Success");
 						// 200 means request succeeded
 						} else {
