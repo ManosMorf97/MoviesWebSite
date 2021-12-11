@@ -36,7 +36,22 @@
 button{
    overflow: hidden;
 }
+.rotation{
+  position:fixed;
+  width: 100px;
+  height: 100px;
+  right: 50%;
+  background-color: #FEFEFE;
+  animation: mymove 5s infinite;
+  animation-delay: 0s;
+  z-index: -1;
+}
+@keyframes mymove {
+  from {transform:rotate(0deg);}
+  to {transform:rotate(360deg);}
+}
 .message{
    color: white;
 }
+
 

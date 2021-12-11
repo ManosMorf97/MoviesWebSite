@@ -28,6 +28,8 @@
 		https://stackoverflow.com/questions/35341696/how-to-convert-map-keys-to-array
 		https://stackoverflow.com/questions/8159524/javascript-pushing-element-at-the-beginning-of-an-array
 		https://www.w3schools.com/jsref/jsref_shift.asp
+		https://www.w3schools.com/cssref/tryit.asp?filename=trycss3_animation-delay
+
 
 */
 var element = document.createElement("link");
@@ -198,13 +200,17 @@ document.getElementById("interests").addEventListener('click',()=>{
 	let max;
 	let bricks=1;
 	let turned_on;
+	let show=false;
 	var contentArea=document.getElementById("list");
 	removeAllChildNodes(contentArea);
 	let h=document.createElement("h1");
-	let message=document.createTextNode("Loading");
+	let message=document.createTextNode("Do not worry this will not take more than a minute");
 	h.appendChild(message);
 	h.classList.add('message');
 	contentArea.appendChild(h);
+	let span=document.createElement("div");
+	span.classList.add('rotation');
+	contentArea.appendChild(span);
 	function step1(){
 	    users=new Array(bricks);
 		let p=new Promise((resolve,reject)=>{
@@ -240,10 +246,11 @@ document.getElementById("interests").addEventListener('click',()=>{
 			if(max2<max[i]||(max2==max[i]&&max_size[i]>max_size2)){
 				max2=max[i];
 				max_user2=max_user[i];
-				max_size2=max_size[index];
+				max_size2=max_size[i];
 			}
 		console.log(max2)
 		console.log(max_user2)
+		console.log(max_size2)
 		step3(max_user2);
 	}
 	
@@ -329,7 +336,7 @@ document.getElementById("interests").addEventListener('click',()=>{
         	cov+=(my_ratings[i]-my_ratings_mean)*(their_ratings[i]-their_ratings_mean);
         }
         let r=cov/(my_ratings_sd*their_ratings_sd);
-        return r;
+        return r>1?1:r;
 
 	}
 
@@ -388,6 +395,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 
 		});
 		promise.then((message)=>{
+			show=true;
 			successful([].concat(...correlated_movies));
 		})
 		
