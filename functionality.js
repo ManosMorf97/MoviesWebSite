@@ -51,7 +51,8 @@ function apostropheKey(key){
 		return key;
 	}
 }
-/*function step3(min_user){
+/*
+function step3(min_user){
 	const xhr= new XMLHttpRequest();
 	let data=null;
 		xhr.onreadystatechange = function() {
@@ -191,7 +192,8 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 
 document.getElementById("interests").addEventListener('click',()=>{
 	var users;
-	var max_user;
+	var max_user=[];
+	var max_size;
 	let movie_array=[...movie_ratings.keys()];
 	let max;
 	let bricks=1;
@@ -207,13 +209,15 @@ document.getElementById("interests").addEventListener('click',()=>{
 	    users=new Array(bricks);
 		let p=new Promise((resolve,reject)=>{
 			max=[];
-            max_user=[];
+			max_size=[];
             turned_on=[];
             for(let i=0; i<bricks; i++)
             	turned_on.push(false);
 			for(let i=0; i<bricks; i++){
 				max.push(-2);
-				max_user.push(null);
+				max_size.push(0);
+				if(max_user[i]==undefined)
+					max_user.push(null);
 				getUsers(movie_array.slice(i*movie_array.length/bricks,(i+1)*movie_array.length/bricks),i,resolve,reject);	
 			}
 		});
@@ -231,11 +235,14 @@ document.getElementById("interests").addEventListener('click',()=>{
 	function step2B(){
 		let max2=max[0];
 		let max_user2=max_user[0];
+		let max_size2=max_size[0];
 		for(let i=1; i<bricks; i++)
-			if(max2<max[i]){
+			if(max2<max[i]||(max2==max[i]&&max_size[i]>max_size2)){
 				max2=max[i];
 				max_user2=max_user[i];
+				max_size2=max_size[index];
 			}
+		console.log(max2)
 		console.log(max_user2)
 		step3(max_user2);
 	}
@@ -297,8 +304,20 @@ document.getElementById("interests").addEventListener('click',()=>{
 			my_ratings.push(movie_ratings.get(movie));
             their_ratings.push(map_rated_movies.get(movie))
 		})//formula in google
-		let my_ratings_mean=my_ratings.reduce((x,y)=>x+y)/common_movies.length;
-		let their_ratings_mean=their_ratings.reduce((x,y)=>x+y)/common_movies.length;
+		let size=common_movies.length;
+		my_ratings.unshift(0)
+		their_ratings.unshift(0);
+		let r=R(my_ratings,their_ratings,size+1)
+        if(max[index]<r||(r==max[index]&&max_size[index]<size)){
+        	max[index]=r;
+        	max_user[index]=user;
+        	max_size[index]=size;
+        }
+       
+	}
+	function R(my_ratings,their_ratings,size){
+		let my_ratings_mean=my_ratings.reduce((x,y)=>x+y)/size;
+		let their_ratings_mean=their_ratings.reduce((x,y)=>x+y)/size;
 		my_ratings.unshift(0);
 		their_ratings.unshift(0);
 		let my_ratings_sd=Math.sqrt(my_ratings.reduce((x,y)=>x+Math.pow(y-my_ratings_mean,2)));
@@ -310,11 +329,8 @@ document.getElementById("interests").addEventListener('click',()=>{
         	cov+=(my_ratings[i]-my_ratings_mean)*(their_ratings[i]-their_ratings_mean);
         }
         let r=cov/(my_ratings_sd*their_ratings_sd);
-        if(r>max[index]){
-        	max[index]=r;
-        	max_user[index]=user;
-        }
-       
+        return r;
+
 	}
 
 	function getArraysIntersection(a1,a2){
