@@ -200,7 +200,6 @@ document.getElementById("interests").addEventListener('click',()=>{
 	let max;
 	let bricks=1;
 	let turned_on;
-	let show=false;
 	var contentArea=document.getElementById("list");
 	removeAllChildNodes(contentArea);
 	let h=document.createElement("h1");
@@ -208,7 +207,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 	h.appendChild(message);
 	h.classList.add('message');
 	contentArea.appendChild(h);
-	let span=document.createElement("div");
+	let span=document.createElement("span");
 	span.classList.add('rotation');
 	contentArea.appendChild(span);
 	function step1(){
@@ -258,10 +257,10 @@ document.getElementById("interests").addEventListener('click',()=>{
 
 	
 	async function getUsers(movie_array,index,resolve,reject){
-		try{
-			let users_ids=[];
-			const xhr= new XMLHttpRequest();
-			xhr.onreadystatechange = function() {
+		let users_ids=[];
+		const xhr= new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			try{
 				if (xhr.readyState == 4) { // 4 means request is finished
 					if (xhr.status == 200) {
 						users[index]=JSON.parse(xhr.responseText);
@@ -277,14 +276,13 @@ document.getElementById("interests").addEventListener('click',()=>{
 					}
 				}else{
 			 	}
-			};
-			xhr.open("post", "http://62.217.127.19:8010/ratings", true);
-			xhr.setRequestHeader('Content-Type', 'application/json');
-			xhr.send(JSON.stringify({movieList:movie_array}));
-			return true;
-		}catch(error){
-			reject("Failure");
-		}
+		 	}catch(error){
+				reject("Failure");
+			}
+		};
+		xhr.open("post", "http://62.217.127.19:8010/ratings", true);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.send(JSON.stringify({movieList:movie_array}));
 	}
 
 	function step2(users_ids,index){
@@ -395,7 +393,6 @@ document.getElementById("interests").addEventListener('click',()=>{
 
 		});
 		promise.then((message)=>{
-			show=true;
 			successful([].concat(...correlated_movies));
 		})
 		
