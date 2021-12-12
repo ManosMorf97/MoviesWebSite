@@ -53,61 +53,7 @@ function apostropheKey(key){
 		return key;
 	}
 }
-/*
-function step3(min_user){
-	const xhr= new XMLHttpRequest();
-	let data=null;
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4) { // 4 means request is finished
-				if (xhr.status == 200) {
-					data=JSON.parse(xhr.responseText);
-					data=[].concat(...data);
-					data=data.filter(x=>x.rating>=4);
-					console.log(data);
-					showMovies(data);
-				// 200 means request succeeded
-				} else {
-				}
-			}else{
-		 	}
-		};
-		xhr.open("get", "http://62.217.127.19:8010/ratings/"+min_user, true);
-		xhr.setRequestHeader('Content-Type', 'application/json');
-		xhr.send();
-}
 
-function showMovies(data){
-		data=data.filter(x=>x.rating>=4);
-		let correlated_movies=new Array(data.length);
-		let promise=new Promise((resolve,reject)=>{
-			for(let i=0; i<data.length; i++){
-				const xhr= new XMLHttpRequest();
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState == 4) { // 4 means request is finished
-						if (xhr.status == 200) {
-							correlated_movies[i]=JSON.parse(xhr.responseText);
-							console.log(correlated_movies[i]);
-							if(i==data.length-1)
-								resolve("Success");
-						// 200 means request succeeded
-						} else {
-						}
-					}else{
-				 	}
-				};
-				xhr.open("get", "http://62.217.127.19:8010/movie/"+data[i].movieId, true);
-				xhr.setRequestHeader('Content-Type', 'application/json');
-				xhr.send();
-			}
-
-		});
-		promise.then((message)=>{
-			successful([].concat(...correlated_movies));
-		})
-		
-	}
-step3(7047)
-*/
 function removeAllChildNodes(parent) {
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
@@ -253,10 +199,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 		step3(max_user2);
 	}
 	
-	
-
-	
-	async function getUsers(movie_array,index,resolve,reject){
+	function getUsers(movie_array,index,resolve,reject){
 		let users_ids=[];
 		const xhr= new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
