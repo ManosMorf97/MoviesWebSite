@@ -29,6 +29,7 @@
 		https://stackoverflow.com/questions/8159524/javascript-pushing-element-at-the-beginning-of-an-array
 		https://www.w3schools.com/jsref/jsref_shift.asp
 		https://www.w3schools.com/cssref/tryit.asp?filename=trycss3_animation-delay
+		https://stackoverflow.com/questions/15593850/sort-array-based-on-object-attribute-javascript
 
 
 */
@@ -206,9 +207,13 @@ document.getElementById("interests").addEventListener('click',()=>{
 			try{
 				if (xhr.readyState == 4) { // 4 means request is finished
 					if (xhr.status == 200) {
-						users[index]=JSON.parse(xhr.responseText);
+						users[index]=[].concat(...JSON.parse(xhr.responseText));//sort
+						console.log(users[index])
+						users[index].sort((a,b)=>(a.userId > b.userId) ? 1 : ((b.userId > a.userId) ? -1 : 0))
 						for(const user of users[index]){
-							users_ids.push(...user.map(x=>x.userId));
+							let pushed=user.userId;
+							if(users_ids.length==0||users_ids[users_ids.length-1]!=pushed)
+								users_ids.push(pushed);
 						}
 					// 200 means request succeeded
 					    step2(users_ids,index);
@@ -229,15 +234,21 @@ document.getElementById("interests").addEventListener('click',()=>{
 	}
 
 	function step2(users_ids,index){
-		users_ids=[...new Set(users_ids)];
-		console.log(users_ids.length);
-		let movies=[].concat(...users[index])
+		console.log(users_ids);
 		console.log("rated_movies")
-		console.log(movies);		
-		for(let i=0; i<users_ids.length; i++){
-			let rated_movies=movies.filter(x=>x.userId==users_ids[i]);
+		let i=0;
+		let j=0;
+		while(i<users_ids.length){
+			let rated_movies=[];
+			while(j<users[index].length&&users[index][j].userId==users_ids[i]){
+				rated_movies.push(users[index][j])
+				j++;
+			}
 			findCorrelation(rated_movies,users_ids[i],index);
-		}
+			if(max[index]==1&&max_size[index]==movie_array.length)
+				break;
+			i++;
+		}		
 
 	}
 
