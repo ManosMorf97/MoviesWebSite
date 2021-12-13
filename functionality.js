@@ -44,7 +44,6 @@ if(localStorage.movie_ratings)
  	movie_ratings=new Map(JSON.parse(localStorage.movie_ratings));
 else
 	movie_ratings=new Map();
-console.log(movie_ratings.keys())
 
 function apostropheKey(key){
 	let apostrophe=key.indexOf("'");
@@ -179,6 +178,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 			step2B();
 		})
 		p.catch((message)=>{
+			bricks++;
 			step1();
 			
 		});
