@@ -30,13 +30,16 @@
 		https://www.w3schools.com/jsref/jsref_shift.asp
 		https://www.w3schools.com/cssref/tryit.asp?filename=trycss3_animation-delay
 		https://stackoverflow.com/questions/15593850/sort-array-based-on-object-attribute-javascript
+		https://www.w3schools.com/jsref/dom_obj_text.asp
+		https://stackoverflow.com/questions/596467/how-do-i-convert-a-float-number-to-a-whole-number-in-javascript
 
 
 */
 var element = document.createElement("link");
 element.setAttribute("rel", "stylesheet");
 element.setAttribute("type", "text/css");
-element.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+document.getElementsByTagName("head")[0].appendChild(element);
+//element.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
 
 //localStorage.clear();
 let movie_ratings;
@@ -65,7 +68,6 @@ function successful(data){
 	removeAllChildNodes(contentArea);
 	console.log(data);
 	if(data){
-		document.getElementsByTagName("head")[0].appendChild(element);
 		for(let i=0; i<data.length; i++){
 			let movie_div=document.createElement("div");
 			movie_div.classList.add("movies");
@@ -75,40 +77,50 @@ function successful(data){
 				movie_info.appendChild(property);
 				movie_div.appendChild(movie_info);
 			}
+			let rating_input=document.createElement("input");
+			let rating_value=movie_ratings.get(data[i].movieId)
+			if(rating_value)
+				rating_input.setAttribute("value",rating_value);
+			rating_input.setAttribute("id",data[i].movieId);
+			let label=document.createElement("label");
+			label.setAttribute("for",rating_input.id);
+			movie_div.appendChild(rating_input);
 			var ratings=document.createElement("h1");
 			let property=document.createTextNode("Ratings");
 			ratings.appendChild(property);
-			movie_div.appendChild(ratings);
-			let stars=[];
-			for(let j=0; j<5; j++){
-				stars.push(document.createElement("span"));
-				stars[j].classList.add('fa');
-				stars[j].classList.add('fa-star');
-				movie_div.appendChild(stars[j]);
-			}
-			for(let j=0; j<5; j++){
-				for(let k=0; k<movie_ratings.get(data[i].movieId); k++){
-					stars[k].classList.add('checked');
-				}
-				let rating=0;
-				stars[j].addEventListener('click',saveRating(stars,j,data[i]));
-			}
+			label.appendChild(ratings);
+			movie_div.appendChild(label);
+			movie_div.appendChild(rating_input);
+			rating_input.addEventListener("keyup",saveRating(data[i],rating_input));
 			contentArea.appendChild(movie_div);
 		}
 	}
 
 }
 
-function saveRating(stars,j,movie){
+function saveRating(movie,rating_input){
 	return ()=>{
-		let rating=j+1;
-		for(let k=0; k<5; k++){
-			if(k<=j)
-				stars[k].classList.add('checked');
-			else
-				stars[k].classList.remove('checked');
+		value=rating_input.value;
+		if(value<0.5)
+			value=0.5
+		if(value>5)
+			value=5;
+		let accepted=[]
+		accepted.push(Math.floor(value));
+		for(let i=1; i<3; i++)
+			accepted.push(accepted[accepted.length-1]+0.5);
+		let min=Math.abs(accepted[0]-value);
+		let min_index=0;
+		for(let i=1; i<3; i++){
+			let value_2=Math.abs(accepted[i]-value) 
+			if(min>value_2){
+				min=value_2;
+				min_index=i
+			}
 		}
-		movie_ratings.set(movie.movieId,rating);
+		console.log(accepted[min_index])
+		if(accepted[min_index]!=NaN)	
+			movie_ratings.set(movie.movieId,accepted[min_index]);
 		localStorage.movie_ratings = JSON.stringify(Array.from(movie_ratings.entries()));
 	}
 }
