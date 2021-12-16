@@ -211,20 +211,19 @@ document.getElementById("interests").addEventListener('click',()=>{
 	}
 	
 	function getUsers(movie_array,index,resolve,reject){
-		let users_ids=[];
 		const xhr= new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) { // 4 means request is finished
 				if (xhr.status == 200) {
 					try{
+						let users_ids=[];
 						console.log(movie_array.length)
 						users[index]=[].concat(...JSON.parse(xhr.responseText));//sort
 						console.log(users[index])
 						users[index].sort((a,b)=>(a.userId > b.userId) ? 1 : ((b.userId > a.userId) ? -1 : 0))
-						for(const user of users[index]){
-							let pushed=user.userId;
-							if(users_ids.length==0||users_ids[users_ids.length-1]!=pushed)
-								users_ids.push(pushed);
+						for(let i=0; i<users[index].length; i++){
+							if(i==0||users[index][i].userId!=users[index][i-1].userId)
+								users_ids.push(users[index][i].userId);
 						}
 					// 200 means request succeeded
 					    step2(users_ids,index);
