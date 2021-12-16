@@ -222,7 +222,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 						console.log(users[index])
 						users[index].sort((a,b)=>(a.userId > b.userId) ? 1 : ((b.userId > a.userId) ? -1 : 0))
 						for(let i=0; i<users[index].length; i++){
-							if(i==0||users[index][i].userId!=users[index][i-1].userId)
+							if(i==0||users[index][i].userId>users[index][i-1].userId)
 								users_ids.push(users[index][i].userId);
 						}
 					// 200 means request succeeded
