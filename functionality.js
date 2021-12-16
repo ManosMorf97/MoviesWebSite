@@ -32,8 +32,6 @@
 		https://stackoverflow.com/questions/15593850/sort-array-based-on-object-attribute-javascript
 		https://www.w3schools.com/jsref/dom_obj_text.asp
 		https://stackoverflow.com/questions/596467/how-do-i-convert-a-float-number-to-a-whole-number-in-javascript
-
-
 */
 var element = document.createElement("link");
 element.setAttribute("rel", "stylesheet");
@@ -216,9 +214,10 @@ document.getElementById("interests").addEventListener('click',()=>{
 		let users_ids=[];
 		const xhr= new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
-			try{
-				if (xhr.readyState == 4) { // 4 means request is finished
-					if (xhr.status == 200) {
+			if (xhr.readyState == 4) { // 4 means request is finished
+				if (xhr.status == 200) {
+					try{
+						console.log(movie_array.length)
 						users[index]=[].concat(...JSON.parse(xhr.responseText));//sort
 						console.log(users[index])
 						users[index].sort((a,b)=>(a.userId > b.userId) ? 1 : ((b.userId > a.userId) ? -1 : 0))
@@ -232,13 +231,14 @@ document.getElementById("interests").addEventListener('click',()=>{
 					    turned_on[index]=true;
 					    if(turned_on.filter(x=>!x).length==0)
 					    	resolve("Success")
-					} else {
+				    }catch(error){
+						reject("Failure");
 					}
-				}else{
-			 	}
-		 	}catch(error){
-				reject("Failure");
-			}
+				} else {
+				}
+			}else{
+		 	}
+		 	
 		};
 		xhr.open("post", "http://62.217.127.19:8010/ratings", true);
 		xhr.setRequestHeader('Content-Type', 'application/json');
@@ -364,5 +364,3 @@ document.getElementById("interests").addEventListener('click',()=>{
 		
 	}
 });
-
-
