@@ -156,6 +156,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 	let max;
 	let bricks=1;
 	let turned_on;
+	//let thrown=true;
 	var contentArea=document.getElementById("list");
 	removeAllChildNodes(contentArea);
 	let h=document.createElement("h1");
@@ -167,31 +168,21 @@ document.getElementById("interests").addEventListener('click',()=>{
 	span.classList.add('rotation');
 	contentArea.appendChild(span);
 	function step1(){
-	    users=new Array(bricks);
 		let p=new Promise((resolve,reject)=>{
+			users=[]
 			max=[];
 			max_size=[];
             turned_on=[];
-            for(let i=0; i<bricks; i++)
-            	turned_on.push(false);
-			for(let i=0; i<bricks; i++){
-				max.push(-2);
-				max_size.push(0);
-				if(max_user[i]==undefined)
-					max_user.push(null);
-				getUsers(movie_array.slice(i*movie_array.length/bricks,(i+1)*movie_array.length/bricks),i,resolve,reject);	
-			}
+        	turned_on.push(false);
+			max.push(-2);
+			max_size.push(0);
+			max_user.push(null);
+			getUsers(movie_array,0,resolve);	
 		});
 		p.then((message)=>{
 			console.log(message);
-			console.log(bricks);
 			step2B();
 		})
-		p.catch((message)=>{
-			bricks++;
-			step1();
-			
-		});
 	}
 	step1();
 	function step2B(){
@@ -210,12 +201,16 @@ document.getElementById("interests").addEventListener('click',()=>{
 		step3(max_user2);
 	}
 	
-	function getUsers(movie_array,index,resolve,reject){
+	function getUsers(movie_array,index,resolve){
 		const xhr= new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) { // 4 means request is finished
 				if (xhr.status == 200) {
 					try{
+						/*if(thrown){
+							thrown=false;
+							throw "Exception";
+						}*/
 						let users_ids=[];
 						console.log(movie_array.length)
 						users[index]=[].concat(...JSON.parse(xhr.responseText));//sort
@@ -231,7 +226,12 @@ document.getElementById("interests").addEventListener('click',()=>{
 					    if(turned_on.filter(x=>!x).length==0)
 					    	resolve("Success")
 				    }catch(error){
-						reject("Failure");
+						turned_on.push(false);
+						max.push(-2);
+						max_size.push(0);
+						max_user.push(null);
+						getUsers(movie_array.slice(0,movie_array.length/2),index,resolve);
+						getUsers(movie_array.slice(movie_array.length/2,movie_array.length),turned_on.length-1,resolve);					
 					}
 				} else {
 				}
