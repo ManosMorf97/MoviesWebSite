@@ -90,6 +90,7 @@ function successful(data){
 			movie_div.appendChild(label);
 			movie_div.appendChild(rating_input);
 			rating_input.addEventListener("keyup",saveRating(data[i],rating_input));
+			rating_input.style.backgroundColor="#FDFD96"
 			contentArea.appendChild(movie_div);
 		}
 	}
