@@ -189,16 +189,13 @@ document.getElementById("interests").addEventListener('click',()=>{
 	function step2B(){
 		let max2=max[0];
 		let max_user2=max_user[0];
-		let max_size2=max_size[0];
 		for(let i=1; i<bricks; i++)
-			if(max2<max[i]||(max2==max[i]&&max_size[i]>max_size2)){
+			if(max2<max[i]){
 				max2=max[i];
 				max_user2=max_user[i];
-				max_size2=max_size[i];
 			}
 		console.log(max2)
 		console.log(max_user2)
-		console.log(max_size2)
 		step3(max_user2);
 	}
 	
@@ -276,15 +273,22 @@ document.getElementById("interests").addEventListener('click',()=>{
             their_ratings.push(map_rated_movies.get(movie))
 		})//formula in google
 		let size=common_movies.length;
-		my_ratings.unshift(0)
-		their_ratings.unshift(0);
-		let r=R(my_ratings,their_ratings,size+1)
-        if(max[index]<r||(r==max[index]&&max_size[index]<size)){
+		let ratings=[my_ratings,their_ratings]
+		let condition=[]
+		for(const rating of ratings)
+			condition.push(my_ratings.filter(x=>x==my_ratings.reduce((x,y)=>x+y)/size).length<size);
+		let r;
+		if(condition[0]&&condition[1])
+			r=R(my_ratings,their_ratings,size)
+		else
+			r=cosinesim(my_ratings,their_ratings);
+		if(r<0.5)
+			return;
+		r*=size;
+        if(max[index]<r){
         	max[index]=r;
         	max_user[index]=user;
-        	max_size[index]=size;
         }
-       
 	}
 	function R(my_ratings,their_ratings,size){
 		let my_ratings_mean=my_ratings.reduce((x,y)=>x+y)/size;
@@ -302,6 +306,20 @@ document.getElementById("interests").addEventListener('click',()=>{
         let r=cov/(my_ratings_sd*their_ratings_sd);
         return r>1?1:r;
 
+	}
+	function cosinesim(my_ratings,their_ratings){
+		let sum=0;
+		for(let i=0; i<my_ratings.length; i++){
+			sum+=my_ratings[i]*their_ratings[i];
+		}
+		let ratings=[my_ratings,their_ratings];
+		let dividor=1;
+		for(const rating of ratings){
+			rating.unshift(0)
+			dividor*=Math.sqrt(rating.reduce((x,y)=>x+Math.pow(y,2)))
+			rating.shift()
+		}
+		return sum/dividor;
 	}
 
 	function getArraysIntersection(a1,a2){
