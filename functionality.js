@@ -347,14 +347,30 @@ document.getElementById("interests").addEventListener('click',()=>{
 			console.log("GO")
 	}
 
-	function showMovies(data){
+	async function showMovies(data){
 		data=data.filter(x=>x.rating>=4);
 		let correlated_movies=new Array(data.length);
 		let turned_on_final=[];
 		for(let i=0; i<data.length; i++)
 			turned_on_final.push(false);
-		let promise=new Promise((resolve,reject)=>{
-			for(let i=0; i<data.length; i++){
+		let begining=0;
+		let ending=1000;
+		while(true){
+			let promise=showPartialMovies(begining,ending,data,correlated_movies,turned_on_final);
+			const response=await promise;
+			begining+=1000;
+			if(begining>=data.length)
+				break;
+			ending+=1000;
+		}
+		successful([].concat(...correlated_movies));
+		
+	}
+	function showPartialMovies(begining,ending,data,correlated_movies,turned_on_final){
+		return new Promise((resolve,reject)=>{
+			if(ending>data.length)
+				ending=data.length
+			for(let i=begining; i<ending; i++){
 				const xhr= new XMLHttpRequest();
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState == 4) { // 4 means request is finished
@@ -362,7 +378,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 							correlated_movies[i]=JSON.parse(xhr.responseText);
 							console.log(correlated_movies[i]);
 							turned_on_final[i]=true
-							if(turned_on_final.filter(x=>!x).length==0)
+							if(turned_on_final.slice(begining,ending).filter(x=>!x).length==0)
 								resolve("Success");
 						// 200 means request succeeded
 						} else {
@@ -376,9 +392,5 @@ document.getElementById("interests").addEventListener('click',()=>{
 			}
 
 		});
-		promise.then((message)=>{
-			successful([].concat(...correlated_movies));
-		})
-		
 	}
 });
