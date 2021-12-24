@@ -152,7 +152,6 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 document.getElementById("interests").addEventListener('click',()=>{
 	var users;
 	var max_user=[];
-	var max_size;
 	let movie_array=[...movie_ratings.keys()];
 	let max;
 	let bricks=1;
@@ -172,11 +171,9 @@ document.getElementById("interests").addEventListener('click',()=>{
 		let p=new Promise((resolve,reject)=>{
 			users=[]
 			max=[];
-			max_size=[];
             turned_on=[];
         	turned_on.push(false);
 			max.push(-2);
-			max_size.push(0);
 			max_user.push(null);
 			getUsers(movie_array,0,resolve);	
 		});
@@ -226,7 +223,6 @@ document.getElementById("interests").addEventListener('click',()=>{
 				    }catch(error){
 						turned_on.push(false);
 						max.push(-2);
-						max_size.push(0);
 						max_user.push(null);
 						getUsers(movie_array.slice(0,movie_array.length/2),index,resolve);
 						getUsers(movie_array.slice(movie_array.length/2,movie_array.length),turned_on.length-1,resolve);					
@@ -254,8 +250,6 @@ document.getElementById("interests").addEventListener('click',()=>{
 				j++;
 			}
 			findCorrelation(rated_movies,users_ids[i],index);
-			if(max[index]==1&&max_size[index]==movie_array.length)
-				break;
 			i++;
 		}		
 
