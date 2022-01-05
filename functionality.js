@@ -61,39 +61,51 @@ function removeAllChildNodes(parent) {
     }
 }
 
+function warning(text){
+	var contentArea=document.getElementById("list");
+	removeAllChildNodes(contentArea);
+	let h=document.createElement("h1");
+	let message=document.createTextNode(text);
+	h.appendChild(message);
+	h.classList.add('message');
+	contentArea.appendChild(h);
+}
+
 function successful(data){
 	var contentArea=document.getElementById("list");
 	removeAllChildNodes(contentArea);
 	console.log(data);
-	if(data){
-		for(let i=0; i<data.length; i++){
-			let movie_div=document.createElement("div");
-			movie_div.classList.add("movies");
-			for(const props in data[i]){
-				let movie_info=document.createElement("h1");
-				let property=document.createTextNode(data[i][props]);
-				movie_info.appendChild(property);
-				movie_div.appendChild(movie_info);
-			}
-			let rating_input=document.createElement("input");
-			let rating_value=movie_ratings.get(data[i].movieId)
-			if(rating_value)
-				rating_input.setAttribute("value",rating_value);
-			rating_input.setAttribute("id",data[i].movieId);
-			let label=document.createElement("label");
-			label.setAttribute("for",rating_input.id);
-			movie_div.appendChild(rating_input);
-			var ratings=document.createElement("h1");
-			let property=document.createTextNode("Ratings");
-			ratings.appendChild(property);
-			label.appendChild(ratings);
-			movie_div.appendChild(label);
-			movie_div.appendChild(rating_input);
-			rating_input.addEventListener("keyup",saveRating(data[i],rating_input));
-			rating_input.style.backgroundColor="#FDFD96"
-			contentArea.appendChild(movie_div);
-		}
+	if(data.length==0){
+		warning("The system cannot find the movie,try to type a word of your movie");
+		return;
 	}
+	for(let i=0; i<data.length; i++){
+		let movie_div=document.createElement("div");
+		movie_div.classList.add("movies");
+		for(const props in data[i]){
+			let movie_info=document.createElement("h1");
+			let property=document.createTextNode(data[i][props]);
+			movie_info.appendChild(property);
+			movie_div.appendChild(movie_info);
+		}
+		let rating_input=document.createElement("input");
+		let rating_value=movie_ratings.get(data[i].movieId)
+		if(rating_value)
+			rating_input.setAttribute("value",rating_value);
+		rating_input.setAttribute("id",data[i].movieId);
+		let label=document.createElement("label");
+		label.setAttribute("for",rating_input.id);
+		movie_div.appendChild(rating_input);
+		var ratings=document.createElement("h1");
+		let property=document.createTextNode("Ratings");
+		ratings.appendChild(property);
+		label.appendChild(ratings);
+		movie_div.appendChild(label);
+		movie_div.appendChild(rating_input);
+		rating_input.addEventListener("keyup",saveRating(data[i],rating_input));
+		rating_input.style.backgroundColor="#FDFD96"
+		contentArea.appendChild(movie_div);
+	}	
 
 }
 
@@ -140,6 +152,10 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 		}
 	};
 	key=apostropheKey(key);
+	if(key.length<=3){
+		warning("Few Information");
+		return;
+	}
 	xhr.open("post", "http://62.217.127.19:8010/movie", true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
 	xhr.send(JSON.stringify({keyword:key}));
@@ -153,19 +169,18 @@ document.getElementById("interests").addEventListener('click',()=>{
 	var users;
 	var max_user=[];
 	let movie_array=[...movie_ratings.keys()];
+	if(movie_array.length==0){
+		warning("You did not rate movies")
+		return;
+	}
 	let max;
 	let bricks=1;
 	let turned_on;
 	//let thrown=true;
-	var contentArea=document.getElementById("list");
-	removeAllChildNodes(contentArea);
-	let h=document.createElement("h1");
-	let message=document.createTextNode("Do not worry this will not take more than a minute");
-	h.appendChild(message);
-	h.classList.add('message');
-	contentArea.appendChild(h);
+	warning("Do not worry this will not take more than a minute");
 	let span=document.createElement("span");
 	span.classList.add('rotation');
+	var contentArea=document.getElementById("list");
 	contentArea.appendChild(span);
 	function step1(){
 		let p=new Promise((resolve,reject)=>{
