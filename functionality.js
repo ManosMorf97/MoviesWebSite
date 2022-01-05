@@ -83,6 +83,7 @@ function successful(data){
 		let movie_div=document.createElement("div");
 		movie_div.classList.add("movies");
 		for(const props in data[i]){
+			if(props=="movieId") continue;
 			let movie_info=document.createElement("h1");
 			let property=document.createTextNode(data[i][props]);
 			movie_info.appendChild(property);
