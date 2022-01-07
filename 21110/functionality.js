@@ -74,7 +74,6 @@ function warning(text){
 function successful(data){
 	var contentArea=document.getElementById("list");
 	removeAllChildNodes(contentArea);
-	console.log(data);
 	if(data.length==0){
 		warning("The system cannot find the movie,try to type a word of your movie");
 		return;
@@ -130,7 +129,6 @@ function saveRating(movie,rating_input){
 				min_index=i
 			}
 		}
-		console.log(accepted[min_index])
 		if(accepted[min_index]!=NaN)	
 			movie_ratings.set(movie.movieId,accepted[min_index]);
 		localStorage.movie_ratings = JSON.stringify(Array.from(movie_ratings.entries()));
@@ -194,7 +192,6 @@ document.getElementById("interests").addEventListener('click',()=>{
 			getUsers(movie_array,0,resolve);	
 		});
 		p.then((message)=>{
-			console.log(message);
 			step2B();
 		})
 	}
@@ -207,8 +204,6 @@ document.getElementById("interests").addEventListener('click',()=>{
 				max2=max[i];
 				max_user2=max_user[i];
 			}
-		console.log(max2)
-		console.log(max_user2)
 		step3(max_user2);
 	}
 	
@@ -223,9 +218,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 							throw "Exception";
 						}*/
 						let users_ids=[];
-						console.log(movie_array.length)
 						users[index]=[].concat(...JSON.parse(xhr.responseText));//sort
-						console.log(users[index])
 						users[index].sort((a,b)=>(a.userId > b.userId) ? 1 : ((b.userId > a.userId) ? -1 : 0))
 						for(let i=0; i<users[index].length; i++){
 							if(i==0||users[index][i].userId>users[index][i-1].userId)
@@ -255,8 +248,6 @@ document.getElementById("interests").addEventListener('click',()=>{
 	}
 
 	function step2(users_ids,index){
-		console.log(users_ids);
-		console.log("rated_movies")
 		let i=0;
 		let j=0;
 		while(i<users_ids.length){
@@ -354,7 +345,6 @@ document.getElementById("interests").addEventListener('click',()=>{
 			xhr.open("get", "http://62.217.127.19:8010/ratings/"+max_user, true);
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.send();
-			console.log("GO")
 	}
 
 	async function showMovies(data){
@@ -385,8 +375,7 @@ document.getElementById("interests").addEventListener('click',()=>{
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState == 4) { // 4 means request is finished
 						if (xhr.status == 200) {
-							correlated_movies[i]=JSON.parse(xhr.responseText);
-							console.log(correlated_movies[i]);
+							correlated_movies[i]=JSON.parse(xhr.responseText);	
 							turned_on_final[i]=true
 							if(turned_on_final.slice(begining,ending).filter(x=>!x).length==0)
 								resolve("Success");
