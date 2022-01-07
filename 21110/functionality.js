@@ -152,7 +152,7 @@ document.getElementById("search_results").addEventListener('submit',(e)=>{
 	};
 	key=apostropheKey(key);
 	if(key.length<=3){
-		warning("Few Information");
+		warning("Few Information,try to type 'title (release year)'");
 		return;
 	}
 	xhr.open("post", "http://62.217.127.19:8010/movie", true);
