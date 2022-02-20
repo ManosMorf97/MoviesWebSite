@@ -8,5 +8,5 @@
 
 ----
 
-The movies and users are taken from a trusted server(not mine) but unforntuanttely I don't know when this server is available
+The movies and users are taken from a trusted server(not my) but unforntuanttely I don't know when this server is available
 
